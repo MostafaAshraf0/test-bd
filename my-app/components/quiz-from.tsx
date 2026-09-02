@@ -25,18 +25,21 @@ export default function QuizForm({ onSubmitted }: QuizFormProps) {
 		setError('')
 
 		const supabase = createClient()
-		const participantId = crypto.randomUUID()
-		const { error: insertError } = await supabase.from('quiz_participants').insert({
-			id: participantId,
-			user_id: user?.id ?? null,
-			name: name.trim(),
-			mobile_phone: mobilePhone.trim(),
-			department: department.trim(),
+		const { data: participantId, error: insertError } = await supabase.rpc('create_quiz_participant', {
+			p_name: name.trim(),
+			p_mobile_phone: mobilePhone.trim(),
+			p_department: department.trim(),
 		})
 
 		if (insertError) {
 			console.error('Could not save quiz participant:', insertError)
-			setError(`Could not save your details: ${insertError.message}`)
+			setError(insertError.message === 'PHONE_EXISTS' ? 'This phone number has already been used for the quiz.' : `Could not save your details: ${insertError.message}`)
+			setSubmitting(false)
+			return
+		}
+
+		if (!participantId) {
+			setError('Could not save your details: no participant ID was returned.')
 			setSubmitting(false)
 			return
 		}
