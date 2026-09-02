@@ -63,6 +63,30 @@ $$;
 
 grant execute on function public.create_quiz_participant(text, text, text) to anon, authenticated;
 
+create or replace function public.complete_quiz_participant(
+  p_participant_id uuid,
+  p_score integer,
+  p_total_questions integer
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.quiz_participants
+  set score = p_score,
+      total_questions = p_total_questions,
+      completed_at = now()
+  where id = p_participant_id
+    and (user_id is null or user_id = (select auth.uid()));
+
+  return found;
+end;
+$$;
+
+grant execute on function public.complete_quiz_participant(uuid, integer, integer) to anon, authenticated;
+
 drop policy if exists "Participants can submit their details" on public.quiz_participants;
 create policy "Participants can submit their details"
 on public.quiz_participants

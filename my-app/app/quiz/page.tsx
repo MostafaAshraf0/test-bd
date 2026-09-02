@@ -35,11 +35,12 @@ export default function QuizPage() {
 			if (!participantId) return
 			setSavingResult(true)
 			setSaveError('')
-			const { error, count } = await createClient()
-				.from('quiz_participants')
-				.update({ score, total_questions: questions.length, completed_at: new Date().toISOString() }, { count: 'exact' })
-				.eq('id', participantId)
-			if (error || (typeof count === 'number' && count !== 1)) {
+			const { data: saved, error } = await createClient().rpc('complete_quiz_participant', {
+				p_participant_id: participantId,
+				p_score: score,
+				p_total_questions: questions.length,
+			})
+			if (error || saved !== true) {
 				setSaveError('Your score could not be saved. Please try again.')
 				setSavingResult(false)
 				return
