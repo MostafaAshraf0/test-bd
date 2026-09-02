@@ -32,7 +32,6 @@ export default function Dashboard() {
 			const { data, error: queryError } = await createClient()
 				.from('quiz_participants')
 				.select('id, name, mobile_phone, department, score, total_questions, completed_at')
-				.not('completed_at', 'is', null)
 				.order('completed_at', { ascending: false })
 
 			if (queryError) setError(`Results could not be loaded: ${queryError.message}`)
@@ -61,8 +60,8 @@ export default function Dashboard() {
 					{loadingResults ? <p className="p-8 text-sm text-zinc-500">Loading results...</p> : error ? <p className="p-8 text-sm text-red-600" role="alert">{error}</p> : participants.length === 0 ? <p className="p-8 text-sm text-zinc-500">No completed quiz results yet.</p> : (
 						<div className="overflow-x-auto">
 							<table className="w-full min-w-[620px] text-left text-sm">
-								<thead className="border-b bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500"><tr><th className="px-6 py-4 font-medium">Name</th><th className="px-6 py-4 font-medium">Mobile phone</th><th className="px-6 py-4 font-medium">Department</th><th className="px-6 py-4 font-medium">Score</th><th className="px-6 py-4 font-medium">Completed</th></tr></thead>
-								<tbody className="divide-y">{participants.map((participant) => <tr key={participant.id} className="text-zinc-700"><td className="px-6 py-4 font-medium text-zinc-950">{participant.name}</td><td className="px-6 py-4">{participant.mobile_phone}</td><td className="px-6 py-4">{participant.department}</td><td className="px-6 py-4">{participant.score} / {participant.total_questions}</td><td className="px-6 py-4">{participant.completed_at ? new Date(participant.completed_at).toLocaleDateString() : '-'}</td></tr>)}</tbody>
+								<thead className="border-b bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500"><tr><th className="px-6 py-4 font-medium">Name</th><th className="px-6 py-4 font-medium">Mobile phone</th><th className="px-6 py-4 font-medium">Department</th><th className="px-6 py-4 font-medium">Score</th><th className="px-6 py-4 font-medium">Status</th></tr></thead>
+								<tbody className="divide-y">{participants.map((participant) => <tr key={participant.id} className="text-zinc-700"><td className="px-6 py-4 font-medium text-zinc-950">{participant.name}</td><td className="px-6 py-4">{participant.mobile_phone}</td><td className="px-6 py-4">{participant.department}</td><td className="px-6 py-4">{participant.score === null ? '-' : `${participant.score} / ${participant.total_questions}`}</td><td className="px-6 py-4">{participant.completed_at ? new Date(participant.completed_at).toLocaleDateString() : 'In progress'}</td></tr>)}</tbody>
 							</table>
 						</div>
 					)}
