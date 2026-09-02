@@ -13,14 +13,14 @@ export default function QuizPage() {
 	const [started, setStarted] = useState(false)
 	const [participantId, setParticipantId] = useState<string | null>(null)
 	const [currentQuestion, setCurrentQuestion] = useState(0)
-	const [selectedAnswers, setSelectedAnswers] = useState<number[]>([])
+	const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>(() => Array(questions.length).fill(null))
 	const [finished, setFinished] = useState(false)
 	const [savingResult, setSavingResult] = useState(false)
 	const [saveError, setSaveError] = useState('')
 
 	const question = questions[currentQuestion]
 	const selectedAnswer = selectedAnswers[currentQuestion]
-	const score = selectedAnswers.reduce((total, answer, index) => total + (answer === questions[index].answer ? 1 : 0), 0)
+	const score = questions.reduce((total, questionItem, index) => total + (selectedAnswers[index] === questionItem.answer ? 1 : 0), 0)
 
 	function selectAnswer(answer: number) {
 		setSelectedAnswers((answers) => {
@@ -39,7 +39,7 @@ export default function QuizPage() {
 				.from('quiz_participants')
 				.update({ score, total_questions: questions.length, completed_at: new Date().toISOString() }, { count: 'exact' })
 				.eq('id', participantId)
-			if (error || count !== 1) {
+			if (error || (typeof count === 'number' && count !== 1)) {
 				setSaveError('Your score could not be saved. Please try again.')
 				setSavingResult(false)
 				return
@@ -55,7 +55,7 @@ export default function QuizPage() {
 		setStarted(false)
 		setParticipantId(null)
 		setCurrentQuestion(0)
-		setSelectedAnswers([])
+		setSelectedAnswers(Array(questions.length).fill(null))
 		setFinished(false)
 		setSaveError('')
 	}
