@@ -4,7 +4,6 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useAuth } from '@/Context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 
 type QuizFormProps = {
@@ -12,7 +11,6 @@ type QuizFormProps = {
 }
 
 export default function QuizForm({ onSubmitted }: QuizFormProps) {
-	const { user } = useAuth()
 	const [name, setName] = useState('')
 	const [mobilePhone, setMobilePhone] = useState('')
 	const [department, setDepartment] = useState('')

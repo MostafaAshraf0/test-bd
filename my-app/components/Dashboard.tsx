@@ -32,6 +32,8 @@ export default function Dashboard() {
 			const { data, error: queryError } = await createClient()
 				.from('quiz_participants')
 				.select('id, name, mobile_phone, department, score, total_questions, completed_at')
+				.not('completed_at', 'is', null)
+				.not('score', 'is', null)
 				.order('completed_at', { ascending: false })
 
 			if (queryError) setError(`Results could not be loaded: ${queryError.message}`)
